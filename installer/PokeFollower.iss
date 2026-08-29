@@ -3,14 +3,23 @@
 ; Requiere que dist\PokeFollower\ ya exista (salida de PyInstaller, Fase 2).
 
 #define MyAppName "PokéFollower"
-#define MyAppVersion "1.0.0"
-#define MyAppPublisher "PokéFollower Desktop (fork personal, no comercial)"
+; Versión semántica: única fuente en version.py (raíz del repo). tools/build.ps1 la lee
+; de ahí y avisa si este valor no coincide. El tag git es "v" + este string.
+#define MyAppVersion "0.1.0-beta.1"
+; Equivalente numérico x.x.x.x que exige Windows para los recursos de versión del .exe
+; del instalador (coincide con version.__version_tuple__).
+#define MyAppVersionNumeric "0.1.0.1"
+#define MyAppPublisher "PokéFollower Desktop (unofficial, non-commercial fan project)"
 #define MyAppExeName "PokeFollower.exe"
 
 [Setup]
 ; AppId fijo — NUNCA cambiar entre versiones: es la identidad para upgrades y
 ; desinstalación. Cambiarlo produce una entrada duplicada en Programas y características.
 AppId={{9D6B59FE-F850-4412-923B-A03E4D593945}
+; Mismo nombre de mutex que crea la app en single_instance.py (MUTEX_NAME). Permite que
+; el instalador/desinstalador detecte una instancia en marcha y pida cerrarla. NO depende
+; de la versión: idéntico entre releases.
+AppMutex=PokeFollowerDesktop
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -25,6 +34,9 @@ DisableProgramGroupPage=yes
 LicenseFile=..\LICENSE.txt
 OutputDir=Output
 OutputBaseFilename=PokeFollower-Setup-{#MyAppVersion}
+VersionInfoVersion={#MyAppVersionNumeric}
+VersionInfoProductVersion={#MyAppVersionNumeric}
+VersionInfoProductTextVersion={#MyAppVersion}
 SetupIconFile=..\assets\icons\pokeball.ico
 Compression=lzma2/max
 SolidCompression=yes
@@ -33,12 +45,17 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 ArchitecturesInstallIn64BitMode=x64compatible
 
 [Languages]
-Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
+; English first = default. Spanish still available in the language picker.
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
+
+[CustomMessages]
+english.AutoStartTask=Start PokéFollower automatically when Windows starts
+spanish.AutoStartTask=Iniciar PokéFollower automáticamente con Windows
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "startupicon"; Description: "Iniciar PokéFollower automáticamente con Windows"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "startupicon"; Description: "{cm:AutoStartTask}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "..\dist\PokeFollower\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
