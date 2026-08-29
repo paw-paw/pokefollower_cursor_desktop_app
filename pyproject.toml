@@ -5,3 +5,7 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+# Los tests importan los módulos de la raíz (import config, from animation import ...).
+# Sin esto sólo funciona vía `python -m pytest` (que añade el cwd); con esto, `pytest`
+# a secas también, y CI no depende de cómo se invoque.
+pythonpath = ["."]
